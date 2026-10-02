@@ -24,7 +24,7 @@ def analyze_website(url):
         )
 
         # Read website HTML
-        soup = BeautifulSoup(response.text, "lxml")
+        soup = BeautifulSoup(response.text, "html.parser")
 
         # -----------------------------
         # Page Title

@@ -40,10 +40,12 @@ def analyze():
     try:
 
         # -------------------------
-        # 1. Website Analysis
+        # 1. WEBSITE ANALYSIS
         # -------------------------
 
-        website_data = analyze_website(website_url)
+        website_data = analyze_website(
+            website_url
+        )
 
         if website_data is None:
             return jsonify({
@@ -58,37 +60,53 @@ def analyze():
             website_data
         )
 
-        # -------------------------
-        # 2. Competitor Discovery
-        # -------------------------
-
-        competitors = discover_competitors(
-            website_url,
-            location_name="India",
-            language_name="English",
-            limit=50
-        )
 
         # -------------------------
-        # 3. Competitor Scoring
+        # 2. COMPETITOR ANALYSIS
         # -------------------------
-
-        competitor_df = score_competitors(
-            competitors
-        )
 
         competitor_results = []
 
-        if not competitor_df.empty:
+        competitor_error = None
 
-            competitor_results = (
-                competitor_df
-                .fillna("")
-                .to_dict(orient="records")
+        try:
+
+            competitors = discover_competitors(
+                website_url,
+                location_name="India",
+                language_name="English",
+                limit=5
             )
 
+            competitor_df = score_competitors(
+                competitors
+            )
+
+            if not competitor_df.empty:
+
+                competitor_results = (
+                    competitor_df
+                    .fillna("")
+                    .to_dict(
+                        orient="records"
+                    )
+                )
+
+        except Exception as error:
+
+            print(
+                "Competitor analysis unavailable:",
+                error
+            )
+
+            competitor_error = (
+                "Competitor analysis is "
+                "temporarily unavailable."
+            )
+
+
         # -------------------------
-        # Final Response
+        # 3. FINAL RESPONSE
         # -------------------------
 
         return jsonify({
@@ -101,18 +119,31 @@ def analyze():
 
             "strengths": strengths,
 
-            "competitors": competitor_results
+            "competitors": competitor_results,
+
+            "competitor_error":
+                competitor_error
 
         })
 
+
     except Exception as error:
 
-        print("ERROR:", error)
+        print(
+            "ERROR:",
+            error
+        )
 
         return jsonify({
-            "error": str(error)
+            "error":
+                "Could not analyze website."
         }), 500
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+
+    app.run(
+        host="0.0.0.0",
+        port=5000,
+        debug=True
+    )
