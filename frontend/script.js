@@ -16,8 +16,22 @@ async function analyzeWebsite() {
     const error =
         document.getElementById("error");
 
-    const results =
-        document.getElementById("results");
+    const text = await response.text();
+
+    console.log("Server status:", response.status);
+    console.log("Server response:", text);
+
+    if (!response.ok) {
+        throw new Error(text || `Server error: ${response.status}`);
+    }
+
+    let result;
+
+    try {
+        result = JSON.parse(text);
+    } catch (error) {
+        throw new Error("Server returned an invalid or empty response.");
+    }
 
 
     if (!url) {
