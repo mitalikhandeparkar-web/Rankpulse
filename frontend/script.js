@@ -3,36 +3,19 @@ let competitorChart = null;
 
 async function analyzeWebsite() {
 
-    const url =
-        document
+    const url = document
         .getElementById("websiteUrl")
         .value
         .trim();
 
+    const loading = document.getElementById("loading");
+    const error = document.getElementById("error");
+    const results = document.getElementById("results");
 
-    const loading =
-        document.getElementById("loading");
 
-    const error =
-        document.getElementById("error");
-
-    const text = await response.text();
-
-    console.log("Server status:", response.status);
-    console.log("Server response:", text);
-
-    if (!response.ok) {
-        throw new Error(text || `Server error: ${response.status}`);
-    }
-
-    let result;
-
-    try {
-        result = JSON.parse(text);
-    } catch (error) {
-        throw new Error("Server returned an invalid or empty response.");
-    }
-
+    // -------------------------
+    // VALIDATE URL
+    // -------------------------
 
     if (!url) {
 
@@ -44,13 +27,15 @@ async function analyzeWebsite() {
 
 
     loading.style.display = "block";
-
     error.textContent = "";
-
     results.style.display = "none";
 
 
     try {
+
+        // -------------------------
+        // SEND REQUEST TO FLASK
+        // -------------------------
 
         const response = await fetch(
             "/api/analyze",
@@ -58,8 +43,7 @@ async function analyzeWebsite() {
                 method: "POST",
 
                 headers: {
-                    "Content-Type":
-                        "application/json"
+                    "Content-Type": "application/json"
                 },
 
                 body: JSON.stringify({
@@ -69,9 +53,62 @@ async function analyzeWebsite() {
         );
 
 
-        const data =
-            await response.json();
+        // -------------------------
+        // READ SERVER RESPONSE
+        // -------------------------
 
+        const text = await response.text();
+
+        console.log(
+            "Server status:",
+            response.status
+        );
+
+        console.log(
+            "Server response:",
+            text
+        );
+
+
+        // -------------------------
+        // CHECK EMPTY RESPONSE
+        // -------------------------
+
+        if (!text || text.trim() === "") {
+
+            throw new Error(
+                "Server returned an empty response. Please check Render logs."
+            );
+        }
+
+
+        // -------------------------
+        // CONVERT RESPONSE TO JSON
+        // -------------------------
+
+        let data;
+
+        try {
+
+            data = JSON.parse(text);
+
+        } catch (jsonError) {
+
+            console.error(
+                "JSON parsing error:",
+                jsonError
+            );
+
+            throw new Error(
+                "Server returned an invalid response: " +
+                text.substring(0, 200)
+            );
+        }
+
+
+        // -------------------------
+        // SERVER ERROR
+        // -------------------------
 
         if (!response.ok) {
 
@@ -79,7 +116,6 @@ async function analyzeWebsite() {
                 data.error ||
                 "Analysis failed."
             );
-
         }
 
 
@@ -97,8 +133,7 @@ async function analyzeWebsite() {
         // WEBSITE DATA
         // -------------------------
 
-        const website =
-            data.website;
+        const website = data.website;
 
 
         document
@@ -154,18 +189,18 @@ async function analyzeWebsite() {
             .getElementById("https")
             .textContent =
             website.https_enabled
-            ? "Enabled"
-            : "Not Enabled";
+                ? "Enabled"
+                : "Not Enabled";
 
 
         // -------------------------
-        // ISSUES
+        // SEO ISSUES
         // -------------------------
 
         const issuesList =
-            document
-            .getElementById("issuesList");
-
+            document.getElementById(
+                "issuesList"
+            );
 
         issuesList.innerHTML = "";
 
@@ -175,21 +210,27 @@ async function analyzeWebsite() {
             data.issues.length > 0
         ) {
 
-            data.issues.forEach(issue => {
+            data.issues.forEach(
+                issue => {
 
-                const li =
-                    document.createElement("li");
+                    const li =
+                        document.createElement(
+                            "li"
+                        );
 
-                li.textContent = issue;
+                    li.textContent = issue;
 
-                issuesList.appendChild(li);
+                    issuesList.appendChild(li);
 
-            });
+                }
+            );
 
         } else {
 
             const li =
-                document.createElement("li");
+                document.createElement(
+                    "li"
+                );
 
             li.textContent =
                 "No major SEO issues detected.";
@@ -199,13 +240,13 @@ async function analyzeWebsite() {
 
 
         // -------------------------
-        // STRENGTHS
+        // SEO STRENGTHS
         // -------------------------
 
         const strengthsList =
-            document
-            .getElementById("strengthsList");
-
+            document.getElementById(
+                "strengthsList"
+            );
 
         strengthsList.innerHTML = "";
 
@@ -215,17 +256,33 @@ async function analyzeWebsite() {
             data.strengths.length > 0
         ) {
 
-            data.strengths.forEach(strength => {
+            data.strengths.forEach(
+                strength => {
 
-                const li =
-                    document.createElement("li");
+                    const li =
+                        document.createElement(
+                            "li"
+                        );
 
-                li.textContent = strength;
+                    li.textContent =
+                        strength;
 
-                strengthsList.appendChild(li);
+                    strengthsList.appendChild(li);
 
-            });
+                }
+            );
 
+        } else {
+
+            const li =
+                document.createElement(
+                    "li"
+                );
+
+            li.textContent =
+                "No specific strengths detected.";
+
+            strengthsList.appendChild(li);
         }
 
 
@@ -238,46 +295,68 @@ async function analyzeWebsite() {
         );
 
 
+        // -------------------------
+        // SHOW RESULTS
+        // -------------------------
+
         results.style.display = "block";
 
 
     } catch (err) {
 
+        console.error(
+            "Analysis error:",
+            err
+        );
+
         error.textContent =
-            err.message;
+            err.message ||
+            "Something went wrong while analyzing the website.";
 
     } finally {
 
         loading.style.display = "none";
+
     }
 }
 
 
+// =====================================================
+// COMPETITOR RENDERING
+// =====================================================
 
 function renderCompetitors(
     competitors
 ) {
 
     const table =
-        document
-        .getElementById(
+        document.getElementById(
             "competitorTable"
+        );
+
+
+    const competitorCount =
+        document.getElementById(
+            "competitorCount"
         );
 
 
     table.innerHTML = "";
 
 
-    document
-        .getElementById(
-            "competitorCount"
-        )
-        .textContent =
+    competitorCount.textContent =
         competitors.length +
         " competitors";
 
 
-    if (competitors.length === 0) {
+    // -------------------------
+    // NO COMPETITORS
+    // -------------------------
+
+    if (
+        !competitors ||
+        competitors.length === 0
+    ) {
 
         table.innerHTML = `
             <tr>
@@ -291,31 +370,53 @@ function renderCompetitors(
     }
 
 
+    // -------------------------
+    // COMPETITOR TABLE
+    // -------------------------
+
     competitors.forEach(
         competitor => {
 
             const row =
-                document.createElement("tr");
+                document.createElement(
+                    "tr"
+                );
+
+
+            const website =
+                competitor.website || "-";
+
+
+            const seoScore =
+                competitor.seo_score ?? "-";
+
+
+            const avgPosition =
+                competitor.avg_position || "-";
+
+
+            const intersections =
+                competitor.intersections || "-";
 
 
             row.innerHTML = `
 
                 <td>
-                    ${competitor.website}
+                    ${website}
                 </td>
 
                 <td>
                     <strong>
-                        ${competitor.seo_score}
+                        ${seoScore}
                     </strong>
                 </td>
 
                 <td>
-                    ${competitor.avg_position || "-"}
+                    ${avgPosition}
                 </td>
 
                 <td>
-                    ${competitor.intersections || "-"}
+                    ${intersections}
                 </td>
 
             `;
@@ -328,34 +429,50 @@ function renderCompetitors(
 
 
     // -------------------------
-    // CHART
+    // COMPETITOR CHART
     // -------------------------
 
     const labels =
         competitors.map(
-            item => item.website
+            item =>
+                item.website || "Unknown"
         );
 
 
     const scores =
         competitors.map(
-            item => item.seo_score
+            item =>
+                Number(item.seo_score) || 0
         );
 
 
     const ctx =
-        document
-        .getElementById(
+        document.getElementById(
             "competitorChart"
         );
 
+
+    if (!ctx) {
+
+        console.warn(
+            "Competitor chart canvas not found."
+        );
+
+        return;
+    }
+
+
+    // Destroy old chart
 
     if (competitorChart) {
 
         competitorChart.destroy();
 
+        competitorChart = null;
     }
 
+
+    // Create new chart
 
     competitorChart =
         new Chart(
@@ -375,11 +492,9 @@ function renderCompetitors(
                                 "Competitor SEO Score",
 
                             data: scores
-
                         }
 
                     ]
-
                 },
 
                 options: {
@@ -393,13 +508,9 @@ function renderCompetitors(
                             beginAtZero: true,
 
                             max: 100
-
                         }
-
                     }
-
                 }
-
             }
         );
 }
