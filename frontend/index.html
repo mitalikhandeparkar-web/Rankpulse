@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SEO Insight Engine</title>
+
+    <link rel="stylesheet"
+          href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+
+        <div class="badge">
+            LIVE SEO ANALYTICS
+        </div>
+
+        <h1>SEO Insight Engine</h1>
+
+        <p>
+            Analyze website SEO performance and discover
+            search competitors automatically.
+        </p>
+
+    </header>
+
+
+    <!-- SEARCH -->
+
+    <section class="search-box">
+
+        <input
+            type="text"
+            id="websiteUrl"
+            placeholder="Enter website URL e.g. example.com"
+        >
+
+        <button onclick="analyzeWebsite()">
+            Analyze Website
+        </button>
+
+    </section>
+
+
+    <div id="loading" class="loading">
+        Analyzing live website and competitors...
+    </div>
+
+
+    <div id="error" class="error"></div>
+
+
+    <!-- DASHBOARD -->
+
+    <section id="results">
+
+
+        <!-- SCORE -->
+
+        <div class="score-card">
+
+            <div>
+
+                <p class="section-label">
+                    SEO HEALTH
+                </p>
+
+                <h2 id="seoScore">
+                    --
+                </h2>
+
+                <p>
+                    Custom project scoring model
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- KPI CARDS -->
+
+        <div class="kpi-grid">
+
+            <div class="card">
+
+                <span>Website</span>
+
+                <strong id="website">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div class="card">
+
+                <span>Status</span>
+
+                <strong id="statusCode">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div class="card">
+
+                <span>H1 Count</span>
+
+                <strong id="h1Count">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div class="card">
+
+                <span>Internal Links</span>
+
+                <strong id="internalLinks">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div class="card">
+
+                <span>Total Images</span>
+
+                <strong id="totalImages">
+                    --
+                </strong>
+
+            </div>
+
+
+            <div class="card">
+
+                <span>Missing ALT</span>
+
+                <strong id="missingAlt">
+                    --
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- PAGE INFORMATION -->
+
+        <div class="section">
+
+            <h2>Website Analysis</h2>
+
+            <div class="info-grid">
+
+                <div>
+
+                    <label>
+                        Page Title
+                    </label>
+
+                    <p id="pageTitle">
+                        --
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Meta Description
+                    </label>
+
+                    <p id="metaDescription">
+                        --
+                    </p>
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        HTTPS
+                    </label>
+
+                    <p id="https">
+                        --
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ISSUES -->
+
+        <div class="two-column">
+
+            <div class="section">
+
+                <h2>SEO Issues</h2>
+
+                <ul id="issuesList"></ul>
+
+            </div>
+
+
+            <div class="section">
+
+                <h2>SEO Strengths</h2>
+
+                <ul id="strengthsList"></ul>
+
+            </div>
+
+        </div>
+
+
+        <!-- COMPETITORS -->
+
+        <div class="section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <p class="section-label">
+                        LIVE SEARCH DATA
+                    </p>
+
+                    <h2>
+                        Competitor Analysis
+                    </h2>
+
+                </div>
+
+                <span id="competitorCount"
+                      class="count-badge">
+                    0 competitors
+                </span>
+
+            </div>
+
+
+            <div class="chart-container">
+
+                <canvas id="competitorChart"></canvas>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Website
+                            </th>
+
+                            <th>
+                                SEO Score
+                            </th>
+
+                            <th>
+                                Avg Position
+                            </th>
+
+                            <th>
+                                Keyword Overlap
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="competitorTable">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+    </section>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
