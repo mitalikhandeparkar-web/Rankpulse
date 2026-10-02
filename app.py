@@ -76,7 +76,7 @@ def analyze():
                 website_url,
                 location_name="India",
                 language_name="English",
-                limit=20
+                limit=3
             )
 
             print(
