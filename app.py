@@ -28,7 +28,7 @@ def home():
 @app.route("/api/analyze", methods=["POST"])
 def analyze():
 
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
 
     website_url = data.get("url", "").strip()
 
@@ -39,9 +39,9 @@ def analyze():
 
     try:
 
-        # -------------------------
+        # =====================================
         # 1. WEBSITE ANALYSIS
-        # -------------------------
+        # =====================================
 
         website_data = analyze_website(
             website_url
@@ -49,7 +49,7 @@ def analyze():
 
         if website_data is None:
             return jsonify({
-                "error": "Could not analyze website"
+                "error": "Could not access the website"
             }), 400
 
         seo_score = calculate_seo_score(
@@ -61,53 +61,60 @@ def analyze():
         )
 
 
-        # -------------------------
+        # =====================================
         # 2. COMPETITOR ANALYSIS
-        # -------------------------
+        # =====================================
 
         competitor_results = []
-
         competitor_error = None
 
         try:
+
+            print("Starting competitor discovery...")
 
             competitors = discover_competitors(
                 website_url,
                 location_name="India",
                 language_name="English",
-                limit=5
+                limit=20
             )
 
-            competitor_df = score_competitors(
-                competitors
+            print(
+                f"Competitors discovered: {len(competitors)}"
             )
 
-            if not competitor_df.empty:
+            if competitors:
 
-                competitor_results = (
-                    competitor_df
-                    .fillna("")
-                    .to_dict(
-                        orient="records"
-                    )
+                competitor_df = score_competitors(
+                    competitors
                 )
+
+                if not competitor_df.empty:
+
+                    competitor_results = (
+                        competitor_df
+                        .fillna("")
+                        .to_dict(
+                            orient="records"
+                        )
+                    )
 
         except Exception as error:
 
             print(
-                "Competitor analysis unavailable:",
-                error
+                "Competitor analysis error:",
+                repr(error)
             )
 
             competitor_error = (
                 "Competitor analysis is "
-                "temporarily unavailable."
+                "currently unavailable."
             )
 
 
-        # -------------------------
+        # =====================================
         # 3. FINAL RESPONSE
-        # -------------------------
+        # =====================================
 
         return jsonify({
 
@@ -121,8 +128,7 @@ def analyze():
 
             "competitors": competitor_results,
 
-            "competitor_error":
-                competitor_error
+            "competitor_error": competitor_error
 
         })
 
@@ -130,13 +136,12 @@ def analyze():
     except Exception as error:
 
         print(
-            "ERROR:",
-            error
+            "MAIN ANALYSIS ERROR:",
+            repr(error)
         )
 
         return jsonify({
-            "error":
-                "Could not analyze website."
+            "error": "Could not analyze website."
         }), 500
 
 
