@@ -1,5 +1,8 @@
 import pandas as pd
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import (
+    ThreadPoolExecutor,
+    as_completed
+)
 
 from .crawler import analyze_website
 from .seo_analysis import calculate_seo_score
@@ -16,7 +19,9 @@ MAX_WORKERS = 5
 CACHE = {}
 
 
-def analyze_single_competitor(competitor):
+def analyze_single_competitor(
+    competitor
+):
 
     website = competitor["website"]
 
@@ -42,7 +47,9 @@ def analyze_single_competitor(competitor):
         # CRAWL WEBSITE
         # -------------------------
 
-        data = analyze_website(website)
+        data = analyze_website(
+            website
+        )
 
         if data is None:
 
@@ -56,7 +63,9 @@ def analyze_single_competitor(competitor):
         # CALCULATE SEO SCORE
         # -------------------------
 
-        seo_score = calculate_seo_score(data)
+        seo_score = calculate_seo_score(
+            data
+        )
 
         # -------------------------
         # CREATE RESULT
@@ -68,26 +77,49 @@ def analyze_single_competitor(competitor):
 
             "seo_score": seo_score,
 
+            # Free discovery does not provide
+            # paid keyword-position metrics.
             "avg_position":
-                competitor.get("avg_position"),
+                competitor.get(
+                    "avg_position",
+                    ""
+                ),
 
             "intersections":
-                competitor.get("intersections"),
+                competitor.get(
+                    "intersections",
+                    ""
+                ),
 
             "h1_count":
-                data["h1_count"],
+                data.get(
+                    "h1_count",
+                    0
+                ),
 
             "total_links":
-                data["total_links"],
+                data.get(
+                    "total_links",
+                    0
+                ),
 
             "total_images":
-                data["total_images"],
+                data.get(
+                    "total_images",
+                    0
+                ),
 
             "images_without_alt":
-                data["images_without_alt"],
+                data.get(
+                    "images_without_alt",
+                    0
+                ),
 
             "https_enabled":
-                data["https_enabled"]
+                data.get(
+                    "https_enabled",
+                    False
+                )
         }
 
         # -------------------------
@@ -112,7 +144,9 @@ def analyze_single_competitor(competitor):
         return None
 
 
-def score_competitors(competitors):
+def score_competitors(
+    competitors
+):
 
     results = []
 
@@ -197,4 +231,6 @@ def score_competitors(competitors):
     # FINAL DATAFRAME
     # -------------------------
 
-    return pd.DataFrame(results)
+    return pd.DataFrame(
+        results
+    )

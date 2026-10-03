@@ -29,7 +29,6 @@ def home():
 def analyze():
 
     data = request.get_json(silent=True) or {}
-
     website_url = data.get("url", "").strip()
 
     if not website_url:
@@ -40,29 +39,26 @@ def analyze():
     try:
 
         # =====================================
-        # 1. WEBSITE ANALYSIS
+        # 1. LIVE WEBSITE ANALYSIS
         # =====================================
 
-        website_data = analyze_website(
-            website_url
-        )
+        print("Analyzing target website:", website_url)
+
+        website_data = analyze_website(website_url)
 
         if website_data is None:
             return jsonify({
                 "error": "Could not access the website"
             }), 400
 
-        seo_score = calculate_seo_score(
-            website_data
-        )
+        seo_score = calculate_seo_score(website_data)
 
         issues, strengths = find_seo_issues(
             website_data
         )
 
-
         # =====================================
-        # 2. COMPETITOR ANALYSIS
+        # 2. FREE AUTOMATIC COMPETITOR ANALYSIS
         # =====================================
 
         competitor_results = []
@@ -70,13 +66,13 @@ def analyze():
 
         try:
 
-            print("Starting competitor discovery...")
+            print("Starting free competitor discovery...")
 
             competitors = discover_competitors(
                 website_url,
                 location_name="India",
                 language_name="English",
-                limit=3
+                limit=10
             )
 
             print(
@@ -107,10 +103,9 @@ def analyze():
             )
 
             competitor_error = (
-                "Competitor analysis is "
-                "currently unavailable."
+                "Automatic competitor discovery "
+                "is temporarily unavailable."
             )
-
 
         # =====================================
         # 3. FINAL RESPONSE
@@ -131,7 +126,6 @@ def analyze():
             "competitor_error": competitor_error
 
         })
-
 
     except Exception as error:
 
